@@ -205,7 +205,10 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 4. La verificación se realizará mediante un mecanismo de confirmación enviado a la dirección proporcionada.
 5. No se permitirá iniciar sesión mientras el correo no esté verificado.
 6. Si el usuario cambia su correo, deberá verificarse la nueva dirección antes de considerarla confirmada.
+7. el estado de verificacion del correo se guardara en: #### `correo_verificado`
 
+- **Descripción:** indica si el usuario ha confirmado que tiene acceso a la dirección de correo registrada.
+- **Reglas:** será un valor booleano. Comenzará en `falso` y cambiará a `verdadero` cuando el usuario complete correctamente la verificación. No se permitirá iniciar sesión mientras permanezca en `falso`.
 **Pendiente:** definir cómo se almacenará y administrará el estado de verificación del correo, mediante un atributo adicional o una entidad separada.
 
 ### 6.5. Reglas de las contraseñas
