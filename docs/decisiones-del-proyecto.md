@@ -100,13 +100,13 @@ Los fallos del servicio de correo no deberán corromper los datos de préstamos 
 
 ## 5. Diseño de la entidad Libro
 
-**Estado:** aprobada, versión 1.0.
+**Estado:** Aprobada, versión 1.0.
 
-### Propósito
+### 5.1. Propósito
 
 Representar un título bibliográfico en una edición determinada y gestionar su inventario de ejemplares.
 
-### Atributos definidos
+### 5.2. Atributos definidos
 
 - `id_libro`: identificador único y obligatorio.
 - `titulo`: título de la obra; obligatorio.
@@ -119,7 +119,7 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 - `cantidad_total`: cantidad total de ejemplares.
 - `cantidad_disponible`: cantidad de ejemplares disponibles.
 
-### Reglas acordadas
+### 5.3. Reglas acordadas
 
 1. Cada registro tendrá un identificador único.
 2. El título no será único por sí solo.
@@ -129,22 +129,132 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 6. Los cambios de inventario deberán ser coherentes con los préstamos existentes.
 7. El ISBN será opcional y se almacenará como texto.
 
-### Aspectos pendientes
+### 5.4. Aspectos pendientes
 
 - Definir cómo se representan uno o varios autores.
 - Precisar la validación del ISBN y el tratamiento de duplicados.
 - Definir cómo se calculan o actualizan las cantidades disponibles.
 - Establecer las reglas para modificar inventarios cuando existan préstamos activos.
 
-## 6. Decisiones pendientes
+## 6. Diseño de la entidad Usuario
+
+**Estado:** Versión preliminar 1.0; pendiente de revisión final.
+
+### 6.1. Propósito
+
+La entidad `Usuario` representa a las personas que utilizan el sistema de gestión de biblioteca. Permite identificar a cada persona, gestionar su acceso, asignar permisos según su rol y registrar su último inicio de sesión exitoso.
+
+Se utilizará una única entidad para lectores, bibliotecarios y administradores. Las diferencias entre estos perfiles se establecerán mediante el atributo `rol`.
+
+### 6.2. Atributos definidos
+
+#### `id_usuario`
+
+- **Descripción:** identificador único del usuario.
+- **Reglas:** generado automáticamente, único e inmutable. Formato propuesto: `ABC00A`.
+
+#### `nombre`
+
+- **Descripción:** nombre de la persona.
+- **Reglas:** obligatorio, entre 2 y 50 caracteres. Admite espacios, tildes y caracteres legítimos de nombres.
+
+#### `correo`
+
+- **Descripción:** dirección de correo electrónico.
+- **Reglas:** obligatorio, único y con formato válido. Debe verificarse antes de permitir el inicio de sesión.
+
+#### `contrasena_hash`
+
+- **Descripción:** hash de la contraseña del usuario.
+- **Reglas:** nunca se almacena la contraseña original. Se utilizará un algoritmo especializado, como Argon2id.
+
+#### `rol`
+
+- **Descripción:** perfil de acceso del usuario.
+- **Reglas:** valores preliminares: `lector`, `bibliotecario` y `administrador`.
+
+#### `estado_cuenta`
+
+- **Descripción:** indica si la cuenta está habilitada.
+- **Reglas:** valores permitidos: `activa` e `inactiva`.
+
+#### `ultima_conexion`
+
+- **Descripción:** fecha y hora del último inicio de sesión exitoso.
+- **Reglas:** puede estar vacío si el usuario nunca ha iniciado sesión. Los intentos fallidos no modifican este valor.
+
+### 6.3. Reglas del identificador
+
+1. El sistema generará automáticamente el identificador de cada usuario.
+2. El formato propuesto contiene tres letras iniciales, dos dígitos y una letra final: `ABC00A`.
+3. Los números avanzarán de `00` a `99`. Al alcanzar `99`, se reiniciarán a `00` y avanzará la tercera letra inicial. Ejemplo: `ABC99A` → `ABD00A`.
+4. El identificador no podrá modificarse manualmente después de su asignación.
+5. La base de datos deberá garantizar que no existan identificadores duplicados, incluso cuando se produzcan registros simultáneos.
+6. La secuencia completa de letras, los límites y el comportamiento al agotar las combinaciones disponibles quedan pendientes de definición.
+
+### 6.4. Reglas del correo electrónico
+
+1. Todo usuario deberá proporcionar una dirección de correo.
+2. Una misma dirección normalizada no podrá asociarse a dos cuentas diferentes.
+3. El sistema validará el formato del correo, sin asumir que dicha validación confirma su existencia.
+4. La verificación se realizará mediante un mecanismo de confirmación enviado a la dirección proporcionada.
+5. No se permitirá iniciar sesión mientras el correo no esté verificado.
+6. Si el usuario cambia su correo, deberá verificarse la nueva dirección antes de considerarla confirmada.
+
+**Pendiente:** definir cómo se almacenará y administrará el estado de verificación del correo, mediante un atributo adicional o una entidad separada.
+
+### 6.5. Reglas de las contraseñas
+
+1. La contraseña elegida por el usuario deberá tener al menos 12 caracteres.
+2. No se exigirá una combinación artificial de mayúsculas, números y símbolos.
+3. Se comprobará que la contraseña no sea común o conocida por estar comprometida.
+4. El sistema almacenará únicamente el hash de la contraseña, nunca la contraseña original.
+5. Se utilizará un algoritmo especializado, como Argon2id, con parámetros seguros.
+6. Al cambiar la contraseña, se generará un nuevo hash y se reemplazará el anterior.
+7. La recuperación del acceso deberá realizarse mediante un procedimiento seguro.
+
+### 6.6. Reglas de los roles
+
+Los roles son preliminares y sus permisos exactos se definirán durante el diseño de las funcionalidades.
+
+- **Lector:** consulta el catálogo, solicita préstamos y consulta su historial personal.
+- **Bibliotecario:** confirma las entregas físicas y registra las devoluciones.
+- **Administrador:** gestiona libros, cuentas de usuario y configuraciones del sistema.
+
+El usuario no podrá asignarse privilegios superiores por sí mismo. El servidor deberá verificar los permisos antes de ejecutar operaciones protegidas.
+
+### 6.7. Reglas del estado de la cuenta
+
+1. Una cuenta `activa` podrá acceder si cumple las demás condiciones de autenticación.
+2. Una cuenta `inactiva` no podrá iniciar sesión.
+3. Cuando se desactive una cuenta, las sesiones abiertas deberán invalidarse y el acceso deberá revocarse inmediatamente.
+4. Desactivar una cuenta no equivale a eliminarla. La eliminación deberá respetar las reglas del sistema, especialmente cuando existan préstamos sin resolver.
+
+### 6.8. Reglas de la última conexión
+
+1. `ultima_conexion` registrará la fecha y hora del último inicio de sesión exitoso.
+2. Podrá permanecer vacío hasta que ocurra el primer inicio de sesión exitoso.
+3. Los intentos fallidos no modificarán el registro.
+4. Este atributo no sustituye el mecanismo de control de inactividad de las sesiones, cuyo tiempo máximo es de 40 minutos.
+
+### 6.9. Aspectos pendientes
+
+- Definir la secuencia completa de generación de identificadores.
+- Definir cómo se representa y administra la verificación del correo.
+- Precisar los permisos de cada rol.
+- Definir el procedimiento de recuperación de contraseñas y la revocación de sesiones.
+- Revisar las reglas de conservación y eliminación de cuentas.
+
+## 7. Decisiones pendientes
 
 - Definir la política de asignación de ejemplares a los lectores en espera.
 - Determinar cuánto tiempo se mantendrá una oportunidad de préstamo para un lector notificado.
-- Diseñar los atributos y las relaciones de las entidades restantes.
+- Completar el diseño de los atributos y las relaciones de las entidades restantes.
 - Definir la arquitectura del sistema y seleccionar las tecnologías.
 - Precisar los procedimientos de pruebas, despliegue y mantenimiento.
+- Resolver los aspectos pendientes de las entidades `Libro` y `Usuario` documentados en las secciones anteriores.
 
-## 7. Historial de cambios
+## 8. Historial de cambios
 
 ### Versión 1.0 — Diseño inicial
 
@@ -152,4 +262,10 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 - Se aprobó la primera versión de la entidad `Libro`.
 - Se registraron las principales reglas de inventario, préstamos, usuarios y notificaciones.
 
-Este documento continuará actualizándose a medida que avance el diseño del sistema
+### Versión 1.1 — Diseño preliminar de Usuario
+
+- Se definieron los siete atributos iniciales de la entidad `Usuario`.
+- Se establecieron reglas preliminares para el identificador, el nombre, el correo, las contraseñas, los roles, el estado de la cuenta y la última conexión.
+- Se documentaron las decisiones pendientes para continuar el diseño.
+
+Este documento continuará actualizándose a medida que avance el diseño del sistema.
