@@ -233,6 +233,10 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 
 7. Los mensajes de respuesta no revelarán si el correo introducido corresponde a una cuenta registrada.
 
+### Decisión técnica pendiente
+
+La selección definitiva del algoritmo de hash para las contraseñas y la configuración de sus parámetros se realizará cuando se definan las tecnologías del sistema. Se mantendrá el requisito de utilizar un algoritmo especializado para contraseñas, con una configuración segura y actualizada
+
 ### 6.6. Reglas de los roles
 
 Los roles son preliminares y sus permisos exactos se definirán durante el diseño de las funcionalidades.
@@ -310,3 +314,10 @@ Los permisos no eliminarán las restricciones de privacidad: cada lector solo po
 - Se documentaron las decisiones pendientes para continuar el diseño.
 
 Este documento continuará actualizándose a medida que avance el diseño del sistema.
+
+### Versión 1.2 — Revisión funcional de Usuario
+
+- Se revisaron los atributos y las reglas de la entidad `Usuario`.
+- Se definió la verificación del correo mediante el atributo `correo_verificado`.
+- Se establecieron las reglas de recuperación de contraseña, permisos por rol y eliminación lógica.
+- Se dejó pendiente la selección técnica del algoritmo de hash y su configuración.
