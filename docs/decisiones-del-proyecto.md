@@ -175,8 +175,9 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 
 #### `estado_cuenta`
 
-- **Descripción:** indica si la cuenta está habilitada.
-- **Reglas:** valores permitidos: `activa` e `inactiva`.
+- **Descripción:** indica la situación de la cuenta dentro del sistema.
+- **Valores:** `activa`, `inactiva` y `eliminada`.
+- **Reglas:** solo las cuentas activas podrán iniciar sesión, siempre que cumplan las demás condiciones de autenticación. Las cuentas inactivas o eliminadas no podrán acceder. La eliminación será lógica y conservará las relaciones históricas necesarias.
 
 #### `ultima_conexion`
 
@@ -260,6 +261,15 @@ Los permisos no eliminarán las restricciones de privacidad: cada lector solo po
 2. Una cuenta `inactiva` no podrá iniciar sesión.
 3. Cuando se desactive una cuenta, las sesiones abiertas deberán invalidarse y el acceso deberá revocarse inmediatamente.
 4. Desactivar una cuenta no equivale a eliminarla. La eliminación deberá respetar las reglas del sistema, especialmente cuando existan préstamos sin resolver.
+
+### Eliminación lógica de cuentas
+
+1. La eliminación de una cuenta será lógica: el registro no se borrará físicamente de la base de datos durante la operación habitual.
+2. La cuenta eliminada no podrá iniciar sesión y sus sesiones activas deberán invalidarse.
+3. Los préstamos históricos conservarán la relación con el usuario correspondiente.
+4. No se permitirá eliminar una cuenta que tenga préstamos sin resolver.
+5. Las operaciones administrativas de eliminación deberán registrarse para permitir su auditoría cuando corresponda.
+6. La conservación o eliminación posterior de datos personales se ajustará a las obligaciones legales y a la política de retención del sistema.
 
 ### 6.8. Reglas de la última conexión
 
