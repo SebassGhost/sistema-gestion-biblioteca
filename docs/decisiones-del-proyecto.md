@@ -343,7 +343,9 @@ Este documento continuará actualizándose a medida que avance el diseño del si
 - Se establecieron las reglas de recuperación de contraseña, permisos por rol y eliminación lógica.
 - Se dejó pendiente la selección técnica del algoritmo de hash y su configuración.
 
-# 9. Solicitudes de préstamo
+- **2026-10-17:** Cierre funcional de las fases 2 y 3 para la versión 1.0. Se documentaron las reglas de solicitudes, lista de espera, préstamos, devoluciones, renovaciones y notificaciones.
+
+## 9. Solicitudes de préstamo
 
 **Estado:** Aprobado funcionalmente para la versión 1.0.
 
@@ -394,7 +396,7 @@ Cuando se confirma la entrega física:
 
 La relación debe permitir consultar el préstamo que se originó a partir de una solicitud.
 
-# 10. Lista de espera
+## 10. Lista de espera
 
 **Estado:** Aprobado funcionalmente para la versión 1.0.
 
@@ -431,7 +433,7 @@ La relación debe permitir consultar el préstamo que se originó a partir de un
 - Si no hay ejemplares disponibles, el lector conserva su posición y el sistema vuelve a comprobar la disponibilidad cuando corresponda.
 - Un ejemplar en proceso de asignación a un lector en espera no puede entregarse mediante otra operación simultánea.
 
-# 11. Préstamos y devoluciones
+## 11. Préstamos y devoluciones
 
 **Estado:** Aprobado funcionalmente para la versión 1.0.
 
@@ -472,7 +474,7 @@ La relación debe permitir consultar el préstamo que se originó a partir de un
 - No se autoriza una renovación si el préstamo está vencido o existe una lista de espera activa para ese libro.
 - Si se autoriza, el sistema actualiza la fecha límite y conserva el registro de la operación.
 
-# 12. Notificaciones
+## 12. Notificaciones
 
 **Estado:** Aprobado funcionalmente para la versión 1.0.
 
@@ -494,7 +496,7 @@ El sistema contempla notificaciones al lector cuando:
 - Las reglas específicas de reintento para la lista de espera se establecen en la sección 10.
 - El canal de envío y los detalles técnicos del proveedor se definirán durante la implementación.
 
-# 13. Pendientes para la implementación
+## 13. Pendientes para la implementación
 
 Los siguientes aspectos no impiden cerrar las reglas funcionales de las fases 2 y 3:
 
@@ -508,7 +510,7 @@ Los siguientes aspectos no impiden cerrar las reglas funcionales de las fases 2 
 
 Estos pendientes se resolverán durante el diseño técnico, la programación y las pruebas, sin reabrir las reglas funcionales ya aprobadas salvo que se detecte una contradicción.
 
-# 14. Cierre funcional de las fases 2 y 3
+## 14. Cierre funcional de las fases 2 y 3
 
 Se consideran aprobadas para la versión 1.0 las reglas funcionales de solicitudes de préstamo, lista de espera, préstamos, devoluciones, renovaciones y notificaciones.
 
