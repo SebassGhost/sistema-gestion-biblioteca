@@ -299,6 +299,27 @@ Los permisos no eliminarán las restricciones de privacidad: cada lector solo po
 - Precisar los procedimientos de pruebas, despliegue y mantenimiento.
 - Resolver los aspectos pendientes de las entidades `Libro` y `Usuario` documentados en las secciones anteriores.
 
+### Diseño de la entidad SolicitudPrestamo
+
+**Estado:** diseño en curso.
+
+#### Reglas acordadas
+
+1. Una solicitud representa la intención de un lector de obtener un libro.
+2. Crear una solicitud no modifica la cantidad de ejemplares disponibles.
+3. Las solicitudes se atenderán por orden de llegada, utilizando su fecha y hora de creación.
+4. La aprobación de una solicitud no equivale a registrar un préstamo ni a entregar un ejemplar.
+5. Antes de confirmar la entrega física, el sistema deberá comprobar nuevamente la disponibilidad y las condiciones del préstamo.
+6. La disponibilidad deberá actualizarse de forma consistente para evitar que dos entregas consuman el mismo ejemplar disponible.
+
+## Registro de cancelación
+
+- El lector puede cancelar únicamente sus propias solicitudes que estén en estado `pendiente`.
+- Al cancelar, el sistema actualizará `estado_solicitud` a `cancelada` y registrará la fecha y hora en `fecha_cancelacion`.
+- La operación se atribuye al lector propietario de la solicitud, cuya identidad se verifica mediante su sesión autenticada.
+- Si la solicitud no está pendiente o no pertenece al lector, el sistema rechazará la operación.
+- Una solicitud cancelada no puede reabrirse ni aprobarse.
+
 ## 8. Historial de cambios
 
 ### Versión 1.0 — Diseño inicial
