@@ -221,6 +221,17 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 6. Al cambiar la contraseña, se generará un nuevo hash y se reemplazará el anterior.
 7. La recuperación del acceso deberá realizarse mediante un procedimiento seguro.
 
+### Recuperación de contraseña
+
+1. El usuario podrá solicitar la recuperación de su contraseña mediante un enlace enviado a su correo verificado.
+2. El enlace tendrá un tiempo de validez limitado y solo podrá utilizarse una vez.
+3. El sistema no enviará ni revelará la contraseña original.
+4. La nueva contraseña deberá cumplir las reglas de seguridad definidas para el registro.
+5. Después de restablecer la contraseña, se invalidarán las sesiones existentes del usuario.
+6. La recuperación no activará cuentas inactivas ni verificará automáticamente direcciones de correo pendientes de confirmación.
+
+7. Los mensajes de respuesta no revelarán si el correo introducido corresponde a una cuenta registrada.
+
 ### 6.6. Reglas de los roles
 
 Los roles son preliminares y sus permisos exactos se definirán durante el diseño de las funcionalidades.
