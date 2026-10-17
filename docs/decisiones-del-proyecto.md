@@ -342,3 +342,174 @@ Este documento continuará actualizándose a medida que avance el diseño del si
 - Se definió la verificación del correo mediante el atributo `correo_verificado`.
 - Se establecieron las reglas de recuperación de contraseña, permisos por rol y eliminación lógica.
 - Se dejó pendiente la selección técnica del algoritmo de hash y su configuración.
+
+# 9. Solicitudes de préstamo
+
+**Estado:** Aprobado funcionalmente para la versión 1.0.
+
+## 9.1. Reglas generales
+
+- El lector puede crear solicitudes de préstamo si su cuenta está activa.
+- La creación de una solicitud no modifica la disponibilidad de los libros.
+- Una solicitud aprobada no reserva automáticamente un ejemplar.
+- El bibliotecario o administrador puede aprobar o rechazar solicitudes.
+- Antes de aprobar una solicitud, el sistema verifica que el lector tenga una cuenta activa, no supere el límite de préstamos simultáneos y que existan ejemplares disponibles.
+- Si no hay ejemplares disponibles al intentar aprobar, la solicitud se rechaza con el motivo `SIN_EJEMPLARES_DISPONIBLES` y se ofrece al lector inscribirse manualmente en la lista de espera.
+- Antes de entregar un libro, el sistema vuelve a verificar la disponibilidad, el estado de la cuenta y el límite de préstamos simultáneos.
+
+## 9.2. Estados de la solicitud
+
+- `pendiente`: solicitud creada y aún sin resolver.
+- `aprobada`: solicitud autorizada, pendiente de entrega física.
+- `rechazada`: solicitud denegada.
+- `cancelada`: solicitud cancelada por el lector.
+- `atendida`: solicitud que generó un préstamo mediante una entrega física confirmada.
+- `cerrada`: solicitud aprobada que el personal cerró sin realizar la entrega.
+
+Los estados `rechazada`, `cancelada`, `atendida` y `cerrada` son terminales. No se permite reabrir estas solicitudes ni generar otro préstamo a partir de ellas.
+
+## 9.3. Cancelación y cierre
+
+- El lector solo puede cancelar sus propias solicitudes mientras estén en estado `pendiente`.
+- Una solicitud cancelada registra su fecha de cancelación.
+- El bibliotecario o administrador puede cerrar manualmente una solicitud aprobada cuando no se vaya a realizar la entrega.
+- El cierre registra la fecha, el motivo y el responsable.
+- Una solicitud cerrada no puede utilizarse para registrar una entrega posterior.
+- Después de un rechazo, cancelación o cierre, el lector puede crear una nueva solicitud si cumple las condiciones.
+
+## 9.4. Duplicados y orden de atención
+
+- No se permiten dos solicitudes activas del mismo lector para el mismo libro. Se consideran activas las solicitudes `pendiente` y `aprobada`.
+- Las solicitudes pendientes se ordenan por fecha de creación ascendente y, en caso de empate, por identificador ascendente.
+- El sistema debe impedir que una misma solicitud genere más de un préstamo, incluso si ocurren operaciones simultáneas.
+
+## 9.5. Relación con los préstamos
+
+Cuando se confirma la entrega física:
+
+1. El sistema crea el préstamo.
+2. Guarda la relación entre la solicitud y el préstamo generado.
+3. Cambia la solicitud a `atendida`.
+4. Impide que esa solicitud vuelva a generar otro préstamo.
+
+La relación debe permitir consultar el préstamo que se originó a partir de una solicitud.
+
+# 10. Lista de espera
+
+**Estado:** Aprobado funcionalmente para la versión 1.0.
+
+## 10.1. Inscripción y prioridad
+
+- La inscripción en la lista de espera es voluntaria y manual.
+- No se inscribe automáticamente al lector cuando su solicitud es rechazada.
+- Solo se permite una inscripción activa por lector y libro.
+- Si el lector intenta inscribirse nuevamente, el sistema informa que ya está en la lista y conserva su posición original.
+- El orden se determina por fecha de inscripción ascendente y, en caso de empate, por identificador ascendente.
+
+## 10.2. Notificación y recogida
+
+- Cuando un ejemplar queda disponible para atender una lista de espera, el sistema comienza por el primer lector de la fila.
+- Se notifica únicamente al lector que ocupa el primer turno.
+- El plazo para recoger el ejemplar es de tres días naturales desde que el servicio de notificación acepta correctamente el envío.
+- La aceptación del envío no garantiza que el mensaje llegue a la bandeja de entrada ni que el lector lo lea.
+- La notificación no crea un préstamo. El préstamo solo se registra cuando se confirma la entrega física.
+- Si el lector no recoge el ejemplar dentro del plazo, el sistema continúa con el siguiente turno, de acuerdo con las reglas de asignación.
+
+## 10.3. Errores de notificación
+
+- El sistema registra los intentos de envío y sus resultados.
+- Se realizan como máximo tres intentos automáticos, incluido el primero.
+- Si los tres intentos fallan, se registra el caso para revisión del personal.
+- Mientras el problema no se resuelva, el lector conserva su prioridad y el ejemplar no se ofrece al siguiente turno.
+- El bibliotecario o administrador puede revisar el error, reintentar manualmente el envío y registrar la resolución.
+- Los reintentos deben evitar notificaciones duplicadas y no deben iniciar el plazo de recogida mientras el envío siga fallando.
+
+## 10.4. Disponibilidad y prioridad
+
+- El sistema verifica el inventario antes de asignar un ejemplar a un turno.
+- La prioridad de la lista no crea ejemplares ni permite entregar una copia inexistente.
+- Si no hay ejemplares disponibles, el lector conserva su posición y el sistema vuelve a comprobar la disponibilidad cuando corresponda.
+- Un ejemplar en proceso de asignación a un lector en espera no puede entregarse mediante otra operación simultánea.
+
+# 11. Préstamos y devoluciones
+
+**Estado:** Aprobado funcionalmente para la versión 1.0.
+
+## 11.1. Creación del préstamo
+
+- El préstamo se crea únicamente cuando el bibliotecario o administrador confirma la entrega física.
+- El sistema registra el lector responsable, el libro, la fecha de entrega y la fecha límite de devolución.
+- Se registra el responsable que confirma la entrega.
+- Una solicitud aprobada no equivale a un préstamo.
+- El sistema verifica nuevamente las condiciones de entrega antes de crear el préstamo.
+- El sistema debe impedir que se registre dos veces la misma entrega.
+
+## 11.2. Plazo de devolución
+
+- La fecha límite se calcula utilizando un plazo configurable.
+- El administrador puede configurar el plazo de préstamo y el máximo de préstamos simultáneos permitidos por lector.
+- El sistema valida que el lector no supere el límite establecido.
+
+## 11.3. Devolución
+
+- El bibliotecario o administrador registra la devolución.
+- El sistema guarda la fecha de devolución y el responsable que la registra.
+- La devolución actualiza la disponibilidad del inventario una sola vez.
+- Si existe una lista de espera para el libro, se inicia el proceso de asignación establecido en la sección 10.
+- El sistema impide registrar dos veces la misma devolución.
+
+## 11.4. Préstamos vencidos
+
+- El sistema identifica los préstamos cuya fecha límite ha pasado y que todavía no tienen una devolución registrada.
+- Se notifica al lector sobre los préstamos vencidos.
+- En la versión 1.0 no se calculan ni aplican multas automáticas.
+
+## 11.5. Renovaciones
+
+- El lector puede solicitar una renovación.
+- La renovación requiere autorización del bibliotecario o administrador.
+- Se permite como máximo una renovación por préstamo en la versión 1.0.
+- No se autoriza una renovación si el préstamo está vencido o existe una lista de espera activa para ese libro.
+- Si se autoriza, el sistema actualiza la fecha límite y conserva el registro de la operación.
+
+# 12. Notificaciones
+
+**Estado:** Aprobado funcionalmente para la versión 1.0.
+
+## 12.1. Eventos que generan notificaciones
+
+El sistema contempla notificaciones al lector cuando:
+
+- Se aproxima la fecha límite de devolución.
+- Un préstamo está vencido.
+- Se registra la devolución de un préstamo.
+- Se requiere recoger un ejemplar asignado mediante la lista de espera.
+- Una solicitud de préstamo es rechazada, indicando el motivo correspondiente.
+
+## 12.2. Registro y errores
+
+- El sistema registra los intentos de envío y sus resultados.
+- Cuando un envío falla, se registra el error para permitir su revisión.
+- El sistema diferencia entre un envío aceptado por el servicio y la confirmación de que el lector recibió o leyó el mensaje.
+- Las reglas específicas de reintento para la lista de espera se establecen en la sección 10.
+- El canal de envío y los detalles técnicos del proveedor se definirán durante la implementación.
+
+# 13. Pendientes para la implementación
+
+Los siguientes aspectos no impiden cerrar las reglas funcionales de las fases 2 y 3:
+
+- Definir el diseño físico definitivo de las tablas, claves y restricciones.
+- Definir el algoritmo concreto de almacenamiento seguro de contraseñas.
+- Configurar con precisión cuánto tiempo antes del vencimiento se envía el primer aviso.
+- Seleccionar el proveedor y canal de notificaciones.
+- Implementar controles de concurrencia para proteger el inventario.
+- Definir los detalles técnicos de auditoría, registros de errores y recuperación ante fallos.
+- Verificar mediante pruebas que las transiciones de estado y las operaciones de inventario no permitan duplicados.
+
+Estos pendientes se resolverán durante el diseño técnico, la programación y las pruebas, sin reabrir las reglas funcionales ya aprobadas salvo que se detecte una contradicción.
+
+# 14. Cierre funcional de las fases 2 y 3
+
+Se consideran aprobadas para la versión 1.0 las reglas funcionales de solicitudes de préstamo, lista de espera, préstamos, devoluciones, renovaciones y notificaciones.
+
+Este cierre corresponde a las reglas funcionales. No implica que el sistema esté programado, probado o listo para producción.
