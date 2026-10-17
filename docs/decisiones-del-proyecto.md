@@ -242,6 +242,18 @@ Los roles son preliminares y sus permisos exactos se definirán durante el dise�
 
 El usuario no podrá asignarse privilegios superiores por sí mismo. El servidor deberá verificar los permisos antes de ejecutar operaciones protegidas.
 
+### Matriz de permisos
+
+Los permisos se organizarán según el rol asignado a cada usuario.
+
+- **Lector:** podrá consultar el catálogo público, solicitar préstamos, inscribirse en listas de espera y consultar su propio historial.
+- **Bibliotecario:** podrá realizar las operaciones del lector relacionadas con la consulta de información necesaria para su trabajo, confirmar entregas físicas y registrar devoluciones.
+- **Administrador:** tendrá los permisos del bibliotecario y, adicionalmente, podrá gestionar libros e inventario, administrar cuentas de usuario y configurar los parámetros del sistema.
+
+El acceso a las operaciones protegidas se validará en el servidor. Ningún usuario podrá obtener permisos superiores modificando la interfaz, una dirección URL o los datos enviados al sistema.
+
+Los permisos no eliminarán las restricciones de privacidad: cada lector solo podrá consultar su propio historial y la información personal de otros usuarios estará protegida.
+
 ### 6.7. Reglas del estado de la cuenta
 
 1. Una cuenta `activa` podrá acceder si cumple las demás condiciones de autenticación.
