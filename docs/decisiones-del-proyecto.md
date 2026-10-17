@@ -183,6 +183,11 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 - **Descripción:** fecha y hora del último inicio de sesión exitoso.
 - **Reglas:** puede estar vacío si el usuario nunca ha iniciado sesión. Los intentos fallidos no modifican este valor.
 
+#### `correo_verificado`
+
+- **Descripción:** indica si el usuario ha confirmado que tiene acceso a la dirección de correo registrada.
+- **Reglas:** será un valor booleano. Comenzará en `falso` y cambiará a `verdadero` cuando el usuario complete correctamente la verificación. No se permitirá iniciar sesión mientras permanezca en `falso`.
+
 ### 6.3. Reglas del identificador
 
 1. El sistema generará automáticamente el identificador de cada usuario.
