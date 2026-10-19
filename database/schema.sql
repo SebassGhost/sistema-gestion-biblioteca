@@ -68,3 +68,21 @@ ADD CONSTRAINT usuarios_correo_unique UNIQUE (correo);
 INSERT INTO usuarios (nombre, correo)
 VALUES
     ('samuel', 'sara@example.com');
+
+-- comprueba si hay correos vacios en nuestra tabla
+SELECT id, nombre, correo
+FROM usuarios
+WHERE correo IS NULL;
+
+-- hacer que el uso del correo sea obligatoro
+ALTER TABLE usuarios
+ALTER COLUMN correo SET NOT NULL;
+
+-- comprobar la estructura
+SELECT
+    column_name,
+    is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+    AND table_name = 'usuarios'
+    AND column_name = 'correo';
