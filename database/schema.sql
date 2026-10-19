@@ -86,3 +86,28 @@ FROM information_schema.columns
 WHERE table_schema = 'public'
     AND table_name = 'usuarios'
     AND column_name = 'correo';
+
+-- Agregar el rol predeterminado para los usuarios
+ALTER TABLE usuarios
+ADD COLUMN rol VARCHAR(20) NOT NULL DEFAULT 'lector';
+
+--comprobacion rapida
+SELECT id, nombre, correo, rol
+FROM usuarios
+ORDER BY id;
+
+--verificar un usuario
+SELECT id, nombre, correo, rol
+FROM usuarios
+WHERE id = 1;
+
+--cambiar un rol del usuario
+
+UPDATE usuarios 
+SET rol = 'administrador'
+WHERE id = 1;
+
+--verificacion
+SELECT id, nombre, correo, rol
+FROM usuarios
+WHERE id = 1;
