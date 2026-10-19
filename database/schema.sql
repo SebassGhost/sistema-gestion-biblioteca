@@ -103,7 +103,7 @@ WHERE id = 1;
 
 --cambiar un rol del usuario
 
-UPDATE usuarios 
+UPDATE usuarios
 SET rol = 'administrador'
 WHERE id = 1;
 
@@ -111,3 +111,17 @@ WHERE id = 1;
 SELECT id, nombre, correo, rol
 FROM usuarios
 WHERE id = 1;
+
+--creacion de la segunda tabla; libros
+CREATE TABLE libros (
+id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+titulo VARCHAR(100) NOT NULL,
+autor VARCHAR(100) NOT NULL,
+disponible BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+--comprobacion
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+ORDER BY table_name;
