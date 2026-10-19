@@ -32,3 +32,39 @@ ORDER BY ordinal_position;
 UPDATE usuarios
 SET correo = 'sebastian@gmail.com'
 WHERE id = 1;
+
+
+SELECT id, correo
+FROM usuarios
+ORDER BY id;
+
+
+-- se agregaran 4 usuarios para comprobar que funcione de manera correcta
+
+INSERT INTO usuarios (nombre, correo)
+VALUES
+    ('nuria', 'nurcita@example.com'),
+    ('sandra', 'sandra@example.com'),
+    ('emanuel','emanuel@example.com'),
+    ('sara', 'sara@example.com');
+
+
+SELECT * FROM usuarios
+ORDER BY id;
+
+-- busqueda de correos duplicados
+SELECT correo, COUNT(*) AS cantidad
+
+FROM usuarios 
+GROUP BY correo
+HAVING COUNT(*) > 1;
+
+--Agregar la restricción UNIQUE
+ALTER TABLE usuarios
+ADD CONSTRAINT usuarios_correo_unique UNIQUE (correo);
+
+
+--prueba de la restrincion UNIQUE
+INSERT INTO usuarios (nombre, correo)
+VALUES
+    ('samuel', 'sara@example.com');
