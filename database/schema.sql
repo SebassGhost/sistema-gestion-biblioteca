@@ -17,3 +17,18 @@ VALUES ('sebastian');
 -- 4. Consultar los usuarios registrados
 SELECT * FROM usuarios;
 
+-- 5. modificar la tabla existente 
+ALTER TABLE usuarios
+ADD COLUMN correo VARCHAR (100);
+
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name = 'usuarios'
+ORDER BY ordinal_position;
+
+
+-- actualizar tabla
+UPDATE usuarios
+SET correo = 'sebastian@gmail.com'
+WHERE id = 1;
