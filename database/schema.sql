@@ -125,3 +125,15 @@ SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'
 ORDER BY table_name;
+
+
+--agregar libros en la tabla
+INSERT INTO libros (titulo, autor)
+VALUES 
+    ('Cien años de soledad', 'Gabriel García Márquez'),
+    ('Don Quijote de la Mancha', 'Miguel de Cervantes');
+
+-- verificacion
+SELECT id, titulo, autor, disponible
+FROM libros
+ORDER BY id;
