@@ -137,3 +137,22 @@ VALUES
 SELECT id, titulo, autor, disponible
 FROM libros
 ORDER BY id;
+
+
+CREATE TABLE prestamos(
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    libro_id INTEGER NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (libro_id) REFERENCES libros(id),
+    fecha_prestamo DATE NOT NULL DEFAULT CURRENT_DATE,
+    fecha_devolucion_prevista DATE NOT NULL,
+    fecha_devolucion_real DATE
+);
+
+-- verificacion
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+    AND table_name = 'prestamos';
+
