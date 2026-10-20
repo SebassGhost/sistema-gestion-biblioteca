@@ -156,3 +156,26 @@ FROM information_schema.tables
 WHERE table_schema = 'public'
     AND table_name = 'prestamos';
 
+-- consultar los usuarios
+SELECT id, nombre, rol
+FROM usuarios
+ORDER BY id;
+
+-- consultar los libros
+SELECT id, titulo, disponible
+FROM libros
+ORDER BY id;
+
+-- registrar un prestamo
+INSERT INTO prestamos (usuario_id, libro_id, fecha_devolucion_prevista, fecha_devolucion_real)
+VALUES(
+    1, 1,
+    '2026-11-02',
+    NULL
+
+);
+
+--comprobacion
+
+SELECT *
+FROM prestamos;
