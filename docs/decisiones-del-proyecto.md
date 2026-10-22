@@ -223,17 +223,22 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 
 ### 6.4. Reglas del correo electrónico
 
-1. Todo usuario deberá proporcionar una dirección de correo.
-2. Una misma dirección normalizada no podrá asociarse a dos cuentas diferentes.
+1. Todo usuario deberá proporcionar una dirección de correo electrónico.
+2. Una misma dirección de correo normalizada no podrá asociarse a dos cuentas diferentes.
 3. El sistema validará el formato del correo, sin asumir que dicha validación confirma su existencia.
 4. La verificación se realizará mediante un mecanismo de confirmación enviado a la dirección proporcionada.
-5. No se permitirá iniciar sesión mientras el correo no esté verificado.
-6. Si el usuario cambia su correo, deberá verificarse la nueva dirección antes de considerarla confirmada.
-7. el estado de verificacion del correo se guardara en: #### `correo_verificado`
+5. No se permitirá iniciar sesión mientras el correo electrónico no esté verificado.
+6. Si el usuario cambia su dirección de correo, deberá verificar la nueva dirección antes de considerarla confirmada.
+
+**Atributo: `correo_verificado`**
 
 - **Descripción:** indica si el usuario ha confirmado que tiene acceso a la dirección de correo registrada.
-- **Reglas:** será un valor booleano. Comenzará en `falso` y cambiará a `verdadero` cuando el usuario complete correctamente la verificación. No se permitirá iniciar sesión mientras permanezca en `falso`.
-**Pendiente:** definir cómo se almacenará y administrará el estado de verificación del correo, mediante un atributo adicional o una entidad separada.
+- **Tipo de dato:** booleano.
+- **Valor inicial:** `falso`.
+- **Regla de actualización:** cambiará a `verdadero` cuando el usuario complete correctamente la verificación.
+- **Regla de acceso:** no se permitirá iniciar sesión mientras su valor sea `falso`.
+
+**Decisión de diseño:** el estado de verificación se almacenará en el atributo `correo_verificado` de la entidad `Usuario`. No se requiere una entidad independiente únicamente para representar este estado.
 
 ### 6.5. Reglas de las contraseñas
 
