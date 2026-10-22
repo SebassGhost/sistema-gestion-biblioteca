@@ -26,7 +26,20 @@ El sistema distinguirá entre lectores, bibliotecarios y administradores. Las op
 
 ### DF-03. Gestión del inventario
 
-El inventario se controlará por título y cantidad de ejemplares, sin registrar individualmente cada ejemplar físico.
+El sistema gestionará el inventario por título y edición, controlando las cantidades de ejemplares sin identificar individualmente cada ejemplar físico.
+
+El sistema tendrá dos modalidades de operación: **préstamo de libros y venta de libros**. Para ello, diferenciará los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan temporalmente sin asignación.
+
+Se cumplirán las siguientes reglas:
+
+1. La cantidad total registrada deberá corresponder a la suma de los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
+2. Un ejemplar no podrá contabilizarse simultáneamente en más de una categoría.
+3. La disponibilidad para préstamos se calculará teniendo en cuenta los ejemplares asignados a préstamos y los préstamos activos.
+4. La disponibilidad para ventas se calculará teniendo en cuenta los ejemplares asignados a ventas y las unidades vendidas.
+5. El sistema impedirá registrar préstamos o ventas cuando no existan ejemplares disponibles para la modalidad correspondiente.
+6. La recepción y reasignación de ejemplares deberá conservar la coherencia de las cantidades del inventario.
+
+Las reglas se establecen a nivel funcional. Su implementación y validación en la base de datos se realizarán durante el desarrollo.
 
 ### DF-04. Solicitud y préstamo
 
