@@ -121,16 +121,18 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 
 ### 5.2. Atributos definidos
 
-- `id_libro`: identificador único y obligatorio.
-- `titulo`: título de la obra; obligatorio.
-- `autor`: autor o autores; obligatoriedad y representación pendientes de precisar.
-- `isbn`: opcional.
-- `editorial`: opcional.
-- `año_publicacion`: opcional.
-- `categoria`: opcional.
-- `descripcion`: opcional.
-- `cantidad_total`: cantidad total de ejemplares.
-- `cantidad_disponible`: cantidad de ejemplares disponibles.
+* `id_libro`: identificador único y obligatorio.
+* `titulo`: título de la obra; obligatorio.
+* `autor`: autor o autores; obligatorio. La representación de uno o varios autores queda pendiente de precisar.
+* `isbn`: opcional.
+* `editorial`: opcional.
+* `año_publicacion`: opcional.
+* `categoria`: opcional.
+* `descripcion`: opcional.
+* `cantidad_total`: cantidad total de ejemplares físicos registrados.
+* `cantidad_asignada_prestamo`: cantidad de ejemplares asignados a la modalidad de préstamo.
+* `cantidad_asignada_venta`: cantidad de ejemplares asignados a la modalidad de venta.
+* `cantidad_sin_asignar`: cantidad de ejemplares que todavía no se han asignado a ninguna modalidad.
 
 ### 5.3. Reglas acordadas
 
