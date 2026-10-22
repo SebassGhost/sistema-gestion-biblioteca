@@ -134,15 +134,21 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 * `cantidad_asignada_venta`: cantidad de ejemplares asignados a la modalidad de venta.
 * `cantidad_sin_asignar`: cantidad de ejemplares que todavía no se han asignado a ninguna modalidad.
 
-### 5.3. Reglas acordadas
+### 5.3. Reglas de negocio
 
-1. Cada registro tendrá un identificador único.
-2. El título no será único por sí solo.
-3. Dos ediciones de una misma obra podrán registrarse por separado.
-4. El inventario se gestionará por título y edición, sin identificar cada ejemplar físico.
-5. La cantidad disponible no podrá ser negativa ni superar la cantidad total.
-6. Los cambios de inventario deberán ser coherentes con los préstamos existentes.
-7. El ISBN será opcional y se almacenará como texto.
+1. Todo libro registrado deberá tener un identificador único y un título obligatorio.
+2. Las cantidades del inventario deberán ser números enteros mayores o iguales a cero.
+3. La cantidad total de ejemplares deberá ser igual a la suma de los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
+4. Un ejemplar solo podrá pertenecer a una categoría del inventario a la vez.
+5. La disponibilidad para préstamos se calculará restando los préstamos activos a la cantidad asignada a préstamos.
+6. La disponibilidad para ventas se calculará restando las unidades vendidas a la cantidad asignada a ventas.
+7. El sistema no permitirá registrar un préstamo si no hay ejemplares disponibles para prestar.
+8. El sistema no permitirá registrar una venta si no hay ejemplares disponibles para vender.
+9. Un libro podrá permanecer registrado aunque su disponibilidad para préstamos y ventas sea cero.
+10. La disponibilidad de cada modalidad se controlará de forma independiente.
+11. Los cambios de inventario deberán mantener la coherencia entre las cantidades registradas y las operaciones realizadas.
+
+La aplicación de estas reglas deberá validarse durante la implementación de la base de datos y de la lógica del sistema.
 
 ### 5.4. Aspectos pendientes
 
