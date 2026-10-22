@@ -263,7 +263,9 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 
 ### Decisión técnica pendiente
 
-La selección definitiva del algoritmo de hash para las contraseñas y la configuración de sus parámetros se realizará cuando se definan las tecnologías del sistema. Se mantendrá el requisito de utilizar un algoritmo especializado para contraseñas, con una configuración segura y actualizada
+Se establece Argon2id como opción preferida para el hash de contraseñas. La selección definitiva y la configuración de sus parámetros se confirmarán durante la implementación de la autenticación, teniendo en cuenta las recomendaciones de seguridad vigentes y las capacidades del entorno de ejecución.
+
+En ningún caso se almacenarán contraseñas en texto plano. El sistema utilizará una biblioteca especializada y un mecanismo seguro de verificación de contraseñas.
 
 ### 6.6. Reglas de los roles
 
