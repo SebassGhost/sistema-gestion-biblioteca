@@ -179,3 +179,15 @@ VALUES(
 
 SELECT *
 FROM prestamos;
+
+
+--consulta para ver a quien y que libro fue prestado
+SELECT
+    usuarios.nombre,
+    libros.titulo
+FROM prestamos
+JOIN usuarios
+ON prestamos.usuario_id = usuarios.id 
+JOIN libros
+ON prestamos.libro_id = libros.id;
+
