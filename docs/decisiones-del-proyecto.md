@@ -152,10 +152,12 @@ La aplicación de estas reglas deberá validarse durante la implementación de l
 
 ### 5.4. Aspectos pendientes
 
-- Definir cómo se representan uno o varios autores.
-- Precisar la validación del ISBN y el tratamiento de duplicados.
-- Definir cómo se calculan o actualizan las cantidades disponibles.
-- Establecer las reglas para modificar inventarios cuando existan préstamos activos.
+- Definir cómo se representan uno o varios autores y cómo se relacionan con un libro.
+- Precisar la validación del ISBN y el tratamiento de posibles duplicados.
+- Definir cómo se registrarán las ventas y cómo se calcularán las unidades vendidas.
+- Establecer las reglas para modificar o reasignar inventario cuando existan préstamos activos.
+- Definir cómo se garantizará la actualización consistente de las cantidades ante operaciones simultáneas.
+- Implementar y verificar las reglas de inventario en la base de datos y en la lógica del sistema.
 
 ## 6. Diseño de la entidad Usuario
 
