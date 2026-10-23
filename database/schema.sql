@@ -191,3 +191,16 @@ ON prestamos.usuario_id = usuarios.id
 JOIN libros
 ON prestamos.libro_id = libros.id;
 
+
+-- crecion de una restricción
+
+ALTER TABLE libros
+ADD CONSTRAINT cantidad_total_no_negativa
+CHECK(cantidad_total >= 0);
+
+
+
+-- modificacion de la cantidad de libros
+UPDATE libros
+SET cantidad_asignada_prestamo = 10
+WHERE id = 1;
