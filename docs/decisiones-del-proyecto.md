@@ -26,20 +26,22 @@ El sistema distinguirá entre lectores, bibliotecarios y administradores. Las op
 
 ### DF-03. Gestión del inventario
 
-El sistema gestionará el inventario por título y edición, controlando las cantidades de ejemplares sin identificar individualmente cada ejemplar físico.
+El sistema gestionará el inventario por título y edición, sin identificar individualmente cada ejemplar físico.
 
-El sistema tendrá dos modalidades de operación: **préstamo de libros y venta de libros**. Para ello, diferenciará los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan temporalmente sin asignación.
+El sistema tendrá dos modalidades de operación: **préstamo de libros y venta de libros**. Para administrar las existencias, distinguirá los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
 
 Se cumplirán las siguientes reglas:
 
-1. La cantidad total registrada deberá corresponder a la suma de los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
+1. Las cantidades registradas deberán conservar la relación entre los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
 2. Un ejemplar no podrá contabilizarse simultáneamente en más de una categoría.
-3. La disponibilidad para préstamos se calculará teniendo en cuenta los ejemplares asignados a préstamos y los préstamos activos.
-4. La disponibilidad para ventas se calculará teniendo en cuenta los ejemplares asignados a ventas y las unidades vendidas.
-5. El sistema impedirá registrar préstamos o ventas cuando no existan ejemplares disponibles para la modalidad correspondiente.
-6. La recepción y reasignación de ejemplares deberá conservar la coherencia de las cantidades del inventario.
+3. La disponibilidad para préstamos se calculará restando los préstamos activos a la cantidad asignada a préstamos.
+4. La disponibilidad para ventas se calculará restando las unidades vendidas a la cantidad asignada a ventas.
+5. El sistema impedirá registrar una entrega en préstamo o una venta cuando no existan unidades disponibles para la modalidad correspondiente.
+6. La devolución de un libro aumentará la disponibilidad para préstamos al dejar de contar el préstamo como activo. No modificará las cantidades asignadas a ventas.
+7. La recepción y reasignación de ejemplares deberá mantener la coherencia del inventario y respetar las operaciones ya registradas.
+8. Las operaciones simultáneas deberán protegerse para evitar que una misma unidad se preste o venda más de una vez.
 
-Las reglas se establecen a nivel funcional. Su implementación y validación en la base de datos se realizarán durante el desarrollo.
+Estas reglas se establecen a nivel funcional. Su implementación y validación en la base de datos y en la lógica del sistema se realizarán durante el desarrollo.
 
 ### DF-04. Solicitud y préstamo
 
@@ -121,32 +123,34 @@ Representar un título bibliográfico en una edición determinada y gestionar su
 
 ### 5.2. Atributos definidos
 
-* `id_libro`: identificador único y obligatorio.
-* `titulo`: título de la obra; obligatorio.
-* `autor`: autor o autores; obligatorio. La representación de uno o varios autores queda pendiente de precisar.
-* `isbn`: opcional.
-* `editorial`: opcional.
-* `año_publicacion`: opcional.
-* `categoria`: opcional.
-* `descripcion`: opcional.
-* `cantidad_total`: cantidad total de ejemplares físicos registrados.
-* `cantidad_asignada_prestamo`: cantidad de ejemplares asignados a la modalidad de préstamo.
-* `cantidad_asignada_venta`: cantidad de ejemplares asignados a la modalidad de venta.
-* `cantidad_sin_asignar`: cantidad de ejemplares que todavía no se han asignado a ninguna modalidad.
+- `id_libro`: identificador único y obligatorio.
+- `titulo`: título de la obra; obligatorio.
+- `autor`: autor o autores; obligatorio. La representación de uno o varios autores queda pendiente de precisar.
+- `isbn`: opcional.
+- `editorial`: opcional.
+- `año_publicacion`: opcional.
+- `categoria`: opcional.
+- `descripcion`: opcional.
+- `cantidad_total`: cantidad total de ejemplares físicos registrados.
+- `cantidad_asignada_prestamo`: cantidad de ejemplares asignados a la modalidad de préstamo.
+- `cantidad_asignada_venta`: cantidad de ejemplares asignados a la modalidad de venta.
+- `cantidad_sin_asignar`: cantidad de ejemplares que todavía no se han asignado a ninguna modalidad.
 
 ### 5.3. Reglas de negocio
 
 1. Todo libro registrado deberá tener un identificador único y un título obligatorio.
 2. Las cantidades del inventario deberán ser números enteros mayores o iguales a cero.
-3. La cantidad total de ejemplares deberá ser igual a la suma de los ejemplares asignados a préstamos, los asignados a ventas y los que permanezcan sin asignación.
+3. Las cantidades registradas deberán respetar la distribución entre ejemplares asignados a préstamos, ejemplares asignados a ventas y ejemplares sin asignación.
 4. Un ejemplar solo podrá pertenecer a una categoría del inventario a la vez.
-5. La disponibilidad para préstamos se calculará restando los préstamos activos a la cantidad asignada a préstamos.
+5. La disponibilidad para préstamos se calculará restando la cantidad de préstamos activos a la cantidad asignada a préstamos.
 6. La disponibilidad para ventas se calculará restando las unidades vendidas a la cantidad asignada a ventas.
-7. El sistema no permitirá registrar un préstamo si no hay ejemplares disponibles para prestar.
-8. El sistema no permitirá registrar una venta si no hay ejemplares disponibles para vender.
-9. Un libro podrá permanecer registrado aunque su disponibilidad para préstamos y ventas sea cero.
-10. La disponibilidad de cada modalidad se controlará de forma independiente.
-11. Los cambios de inventario deberán mantener la coherencia entre las cantidades registradas y las operaciones realizadas.
+7. No se permitirá confirmar la entrega de un préstamo si no existen ejemplares disponibles para préstamo.
+8. No se permitirá registrar una venta si no existen unidades disponibles para venta.
+9. Un libro podrá permanecer registrado aunque no tenga ejemplares disponibles para préstamos o ventas.
+10. Los ejemplares asignados a ventas no se considerarán disponibles para préstamos ni para la lista de espera.
+11. La devolución de un préstamo hará que el ejemplar vuelva a contarse como disponible para préstamo, sin modificar las cantidades asignadas a ventas.
+12. Las operaciones de recepción, asignación, reasignación, préstamo, devolución y venta deberán conservar la coherencia del inventario.
+13. El sistema deberá impedir que operaciones simultáneas utilicen más unidades de las disponibles en la modalidad correspondiente.
 
 La aplicación de estas reglas deberá validarse durante la implementación de la base de datos y de la lógica del sistema.
 
@@ -154,9 +158,11 @@ La aplicación de estas reglas deberá validarse durante la implementación de l
 
 - Definir cómo se representan uno o varios autores y cómo se relacionan con un libro.
 - Precisar la validación del ISBN y el tratamiento de posibles duplicados.
-- Definir cómo se registrarán las ventas y cómo se calcularán las unidades vendidas.
-- Establecer las reglas para modificar o reasignar inventario cuando existan préstamos activos.
-- Definir cómo se garantizará la actualización consistente de las cantidades ante operaciones simultáneas.
+- Definir el registro de ventas, incluyendo las unidades vendidas y la información histórica de cada operación.
+- Definir cómo se interpreta la cantidad total cuando se registran ventas y cómo se conserva la relación entre las cantidades del inventario.
+- Establecer las reglas para recibir y reasignar ejemplares entre las categorías sin asignación, préstamo y venta.
+- Definir las restricciones de reasignación cuando existan préstamos activos o lectores en lista de espera.
+- Determinar cómo se garantizará la actualización consistente de las cantidades ante operaciones simultáneas.
 - Implementar y verificar las reglas de inventario en la base de datos y en la lógica del sistema.
 
 ## 6. Diseño de la entidad Usuario
@@ -230,15 +236,7 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 5. No se permitirá iniciar sesión mientras el correo electrónico no esté verificado.
 6. Si el usuario cambia su dirección de correo, deberá verificar la nueva dirección antes de considerarla confirmada.
 
-**Atributo: `correo_verificado`**
-
-- **Descripción:** indica si el usuario ha confirmado que tiene acceso a la dirección de correo registrada.
-- **Tipo de dato:** booleano.
-- **Valor inicial:** `falso`.
-- **Regla de actualización:** cambiará a `verdadero` cuando el usuario complete correctamente la verificación.
-- **Regla de acceso:** no se permitirá iniciar sesión mientras su valor sea `falso`.
-
-**Decisión de diseño:** el estado de verificación se almacenará en el atributo `correo_verificado` de la entidad `Usuario`. No se requiere una entidad independiente únicamente para representar este estado.
+**Decisión de diseño:** el atributo `correo_verificado` de la entidad `Usuario` almacenará el estado de verificación del correo. Su valor inicial será `falso` y cambiará a `verdadero` cuando el usuario complete correctamente la verificación. Las reglas de acceso asociadas a este atributo se mantienen según lo establecido en la sección 6.2. No se requiere una entidad independiente únicamente para representar este estado.
 
 ### 6.5. Reglas de las contraseñas
 
@@ -258,7 +256,6 @@ Se utilizará una única entidad para lectores, bibliotecarios y administradores
 4. La nueva contraseña deberá cumplir las reglas de seguridad definidas para el registro.
 5. Después de restablecer la contraseña, se invalidarán las sesiones existentes del usuario.
 6. La recuperación no activará cuentas inactivas ni verificará automáticamente direcciones de correo pendientes de confirmación.
-
 7. Los mensajes de respuesta no revelarán si el correo introducido corresponde a una cuenta registrada.
 
 ### Decisión técnica pendiente
@@ -269,7 +266,7 @@ En ningún caso se almacenarán contraseñas en texto plano. El sistema utilizar
 
 ### 6.6. Reglas de los roles
 
-Los roles son preliminares y sus permisos exactos se definirán durante el diseño de las funcionalidades.
+Los roles y sus permisos funcionales están definidos para la versión 1.0. Los controles técnicos de autorización se implementarán y verificarán durante el desarrollo y las pruebas del sistema.
 
 - **Lector:** consulta el catálogo, solicita préstamos y consulta su historial personal.
 - **Bibliotecario:** confirma las entregas físicas y registra las devoluciones.
@@ -314,24 +311,32 @@ Los permisos no eliminarán las restricciones de privacidad: cada lector solo po
 
 ### 6.9. Aspectos pendientes
 
-- Definir la secuencia completa de generación de identificadores.
-- Definir cómo se representa y administra la verificación del correo.
-- Precisar los permisos de cada rol.
-- Definir el procedimiento de recuperación de contraseñas y la revocación de sesiones.
-- Revisar las reglas de conservación y eliminación de cuentas.
+6.9. Aspectos pendientes
+
+- Definir la secuencia completa de generación de identificadores de usuario.
+
+- Precisar las reglas de conservación y eliminación de cuentas conforme a las necesidades del sistema y las obligaciones aplicables.
+
+- Validar durante la implementación la integración entre el estado de la cuenta, la verificación del correo y la autenticación.
+
+- Verificar mediante pruebas que los permisos de cada rol se apliquen correctamente y que se respeten las restricciones de privacidad.
 
 ## 7. Decisiones pendientes
 
-- Definir la política de asignación de ejemplares a los lectores en espera.
-- Determinar cuánto tiempo se mantendrá una oportunidad de préstamo para un lector notificado.
-- Completar el diseño de los atributos y las relaciones de las entidades restantes.
-- Definir la arquitectura del sistema y seleccionar las tecnologías.
-- Precisar los procedimientos de pruebas, despliegue y mantenimiento.
-- Resolver los aspectos pendientes de las entidades `Libro` y `Usuario` documentados en las secciones anteriores.
+- Completar el diseño de los atributos, las relaciones y las restricciones de las entidades restantes.
+- Finalizar el diseño del inventario mixto, incluyendo el significado de la cantidad total, el registro de ventas y la distribución de ejemplares entre préstamos, ventas y sin asignación.
+- Definir las reglas de recepción y reasignación de ejemplares.
+- Definir la arquitectura general del sistema y seleccionar las tecnologías que se utilizarán.
+- Seleccionar el proveedor y el canal para el envío de notificaciones.
+- Definir los procedimientos de pruebas, despliegue y mantenimiento.
+- Completar el diseño físico de la base de datos, incluyendo tablas, claves, restricciones y controles de concurrencia.
+- Confirmar durante la implementación el algoritmo de hash de contraseñas y sus parámetros de seguridad, tomando Argon2id como opción preferida.
+
+Estos pendientes corresponden al diseño técnico y a la implementación. No reabren las reglas funcionales ya aprobadas, salvo que durante el desarrollo se detecte una contradicción que requiera revisión.
 
 ### Diseño de la entidad SolicitudPrestamo
 
-**Estado:** diseño en curso.
+**Estado:** reglas funcionales aprobadas para la versión 1.0; diseño de atributos, relaciones y restricciones pendiente de completar.
 
 #### Reglas acordadas
 
@@ -339,7 +344,7 @@ Los permisos no eliminarán las restricciones de privacidad: cada lector solo po
 2. Crear una solicitud no modifica la cantidad de ejemplares disponibles.
 3. Las solicitudes se atenderán por orden de llegada, utilizando su fecha y hora de creación.
 4. La aprobación de una solicitud no equivale a registrar un préstamo ni a entregar un ejemplar.
-5. Antes de confirmar la entrega física, el sistema deberá comprobar nuevamente la disponibilidad y las condiciones del préstamo.
+5. Antes de confirmar la entrega física, el sistema deberá comprobar nuevamente la disponibilidad de ejemplares asignados a préstamos y las condiciones del préstamo. Los ejemplares asignados a ventas no se considerarán disponibles para esta operación.
 6. La disponibilidad deberá actualizarse de forma consistente para evitar que dos entregas consuman el mismo ejemplar disponible.
 
 ## Registro de cancelación
@@ -375,6 +380,15 @@ Este documento continuará actualizándose a medida que avance el diseño del si
 
 - **2026-10-17:** Cierre funcional de las fases 2 y 3 para la versión 1.0. Se documentaron las reglas de solicitudes, lista de espera, préstamos, devoluciones, renovaciones y notificaciones.
 
+### Versión 1.3 — Revisión de coherencia y reglas del inventario mixto
+
+- Se precisaron las reglas de gestión del inventario para distinguir ejemplares destinados a préstamos, ventas y sin asignación.
+- Se reforzaron las reglas de disponibilidad y protección ante operaciones simultáneas.
+- Se aclaró que las solicitudes aprobadas no generan préstamos hasta confirmar la entrega física.
+- Se precisó que las devoluciones modifican la disponibilidad para préstamos sin alterar las cantidades asignadas a ventas.
+- Se consolidaron los pendientes funcionales y técnicos del inventario mixto.
+- Se mantuvo pendiente la definición del tratamiento de la cantidad total frente a las ventas y de las reglas de reasignación de ejemplares.
+
 ## 9. Solicitudes de préstamo
 
 **Estado:** Aprobado funcionalmente para la versión 1.0.
@@ -387,7 +401,7 @@ Este documento continuará actualizándose a medida que avance el diseño del si
 - El bibliotecario o administrador puede aprobar o rechazar solicitudes.
 - Antes de aprobar una solicitud, el sistema verifica que el lector tenga una cuenta activa, no supere el límite de préstamos simultáneos y que existan ejemplares disponibles.
 - Si no hay ejemplares disponibles al intentar aprobar, la solicitud se rechaza con el motivo `SIN_EJEMPLARES_DISPONIBLES` y se ofrece al lector inscribirse manualmente en la lista de espera.
-- Antes de entregar un libro, el sistema vuelve a verificar la disponibilidad, el estado de la cuenta y el límite de préstamos simultáneos.
+- Antes de confirmar una entrega física, el sistema verificará que la cuenta del lector esté activa, que no se supere el límite de préstamos simultáneos y que existan ejemplares disponibles en el inventario destinado a préstamos. Las unidades asignadas a ventas no se considerarán disponibles para esta operación.
 
 ## 9.2. Estados de la solicitud
 
@@ -414,6 +428,7 @@ Los estados `rechazada`, `cancelada`, `atendida` y `cerrada` son terminales. No 
 - No se permiten dos solicitudes activas del mismo lector para el mismo libro. Se consideran activas las solicitudes `pendiente` y `aprobada`.
 - Las solicitudes pendientes se ordenan por fecha de creación ascendente y, en caso de empate, por identificador ascendente.
 - El sistema debe impedir que una misma solicitud genere más de un préstamo, incluso si ocurren operaciones simultáneas.
+- La validación de disponibilidad y la confirmación de la entrega deberán ejecutarse de forma consistente para impedir que dos operaciones simultáneas asignen el mismo ejemplar para préstamo.
 
 ## 9.5. Relación con los préstamos
 
@@ -458,10 +473,13 @@ La relación debe permitir consultar el préstamo que se originó a partir de un
 
 ## 10.4. Disponibilidad y prioridad
 
-- El sistema verifica el inventario antes de asignar un ejemplar a un turno.
+- La creación del préstamo y la confirmación de la entrega física deberán formar parte de una operación consistente que impida consumir dos veces la misma unidad disponible, incluso cuando se produzcan operaciones simultáneas.
 - La prioridad de la lista no crea ejemplares ni permite entregar una copia inexistente.
 - Si no hay ejemplares disponibles, el lector conserva su posición y el sistema vuelve a comprobar la disponibilidad cuando corresponda.
 - Un ejemplar en proceso de asignación a un lector en espera no puede entregarse mediante otra operación simultánea.
+- La asignación de ejemplares a la lista de espera utilizará exclusivamente la cantidad disponible del inventario destinado a préstamos. Los ejemplares asignados a ventas no podrán utilizarse para atender esta lista.
+- La asignación de ejemplares a la lista de espera utilizará exclusivamente la disponibilidad del inventario destinado a préstamos. Los ejemplares asignados a ventas no podrán utilizarse para atender esta lista.
+- La asignación y la confirmación de una entrega deberán coordinarse para impedir que un mismo ejemplar disponible para préstamo se ofrezca o entregue simultáneamente a más de un lector.
 
 ## 11. Préstamos y devoluciones
 
@@ -486,7 +504,7 @@ La relación debe permitir consultar el préstamo que se originó a partir de un
 
 - El bibliotecario o administrador registra la devolución.
 - El sistema guarda la fecha de devolución y el responsable que la registra.
-- La devolución actualiza la disponibilidad del inventario una sola vez.
+La devolución se registrará una sola vez. Al dejar de estar activo el préstamo, el ejemplar volverá a contarse como disponible para préstamos, sin modificar las cantidades asignadas a ventas ni el inventario total registrado.
 - Si existe una lista de espera para el libro, se inicia el proceso de asignación establecido en la sección 10.
 - El sistema impide registrar dos veces la misma devolución.
 
@@ -530,13 +548,15 @@ El sistema contempla notificaciones al lector cuando:
 
 Los siguientes aspectos no impiden cerrar las reglas funcionales de las fases 2 y 3:
 
-- Definir el diseño físico definitivo de las tablas, claves y restricciones.
-- Definir el algoritmo concreto de almacenamiento seguro de contraseñas.
-- Configurar con precisión cuánto tiempo antes del vencimiento se envía el primer aviso.
-- Seleccionar el proveedor y canal de notificaciones.
-- Implementar controles de concurrencia para proteger el inventario.
+- Definir el diseño físico definitivo de las tablas, claves, relaciones y restricciones.
+- Confirmar el algoritmo de hash de contraseñas y sus parámetros de seguridad, tomando Argon2id como opción preferida.
+- Configurar cuánto tiempo antes del vencimiento se enviará el primer aviso.
+- Seleccionar e integrar el proveedor y el canal de notificaciones.
+- Implementar controles de concurrencia para proteger el inventario y evitar que varias operaciones consuman las mismas unidades disponibles.
+- Implementar el registro de ventas y la actualización coherente de las cantidades correspondientes.
+- Implementar las reglas de recepción y reasignación de ejemplares.
 - Definir los detalles técnicos de auditoría, registros de errores y recuperación ante fallos.
-- Verificar mediante pruebas que las transiciones de estado y las operaciones de inventario no permitan duplicados.
+- Verificar mediante pruebas las transiciones de estado, las operaciones de inventario, las devoluciones, las ventas y la prevención de duplicados.
 
 Estos pendientes se resolverán durante el diseño técnico, la programación y las pruebas, sin reabrir las reglas funcionales ya aprobadas salvo que se detecte una contradicción.
 
