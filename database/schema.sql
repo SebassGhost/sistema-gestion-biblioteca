@@ -204,3 +204,7 @@ CHECK(cantidad_total >= 0);
 UPDATE libros
 SET cantidad_asignada_prestamo = 10
 WHERE id = 1;
+
+SELECT * FROM usuarios
+
+SELECT * FROM libros
